@@ -47,36 +47,24 @@ while True:
         f.close()
 
     # Split items into its separate beautifulsoup list 
-    questions = soup.find_all("div", {"role": "listitem"}) # TODO: Find a way to not split checkgbox options into separate questions
+    questions = soup.find_all(lambda div: div.name == "div" and len(div.attrs) == 2, {"role": "listitem"})
     open_ended_ids = soup.find_all("input", {"type": "hidden", "value": ""})   
     open_ended_ids_count = 0
 
-    c = 0
     for question in questions:
         _soup = BeautifulSoup(str(question), 'html.parser')
         _question = _soup.find("span", {}).contents[0]
-
-        f = open(f"question {c}.html", "w", encoding="utf-8")
-        f.write(_soup.prettify())
-        f.close()
-
-        c += 1
-
         _required = False
         _options = []
         _id = None
         _type = None
 
-        # TODO: Also add support for open-ended questions as well as checkbox questions
-        # TODO: Also add whether if the question is required or not
         try:
             # Try if question is an MCQ question
             _id = _soup.find("input").attrs["name"].replace("_sentinel", "")
             all_spans = _soup.find_all("span")
             required_question = _soup.find("span", {"aria-label": "Required question"})
-            print(all_spans[-1].contents)
-            if all_spans[-1].contents[0] != "Clear selection" and required_question == None:
-                print("amogus")
+            if all_spans[-1].contents[0] != "Clear selection" and _soup.find_all("div")[-2].contents[0] == "Required":
                 raise Exception("Should not be an MCQ")
 
             # Check if the question is required
@@ -112,10 +100,23 @@ while True:
                 _type = "Open Ended"
             except:
                 # Checkbox question
-                _id_div = _soup.find("input", {"type": "hidden"})
-                if _id_div != None:
-                    _id = _id_div.attrs['name'].replace("_sentinel", "")
-                    
+                _id = _soup.find("input", {"type": "hidden"}).attrs['name'].replace("_sentinel", "")
+                required_question = _soup.find("span", {"aria-label": "Required question"})
+                all_spans = _soup.find_all("span")
+
+                # Check if the question is required
+                if required_question != None:
+                    _required = True
+
+                    spans = all_spans[1:]
+                    for i in range(len(spans) - 1): 
+                        _options.append(spans[i + 1].contents[0])
+                else:
+                    spans = all_spans[1:]
+                    for i in range(len(spans)): 
+                        _options.append(spans[i].contents[0])
+                
+                _type = "Checkbox"
 
         question_dictionary[_id] = {
             "Question": _question,
@@ -126,9 +127,8 @@ while True:
 
     print(ConsoleColor.HEADER + "Here is the data below" + ConsoleColor.ENDC)
     print(json.dumps(question_dictionary, indent=4))
-    # print(question_dictionary)
-
-    # Ask questions about spamming
+    
+    # TODO: Add graph phrmat to show data collected
 
 
 # new_link = re.sub(r'(?is)viewForm.+', "formResponse", link).replace("/d/e", "/u/0/d/e")
