@@ -288,6 +288,7 @@ while True:
     threads.append(t)
 
     for i in range(len(threads)):
+        print(f"Starting thread {i}")
         threads[i].start()
             
     for i in range(len(threads)):
