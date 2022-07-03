@@ -25,6 +25,7 @@ def do_request(times: int, url, data):
         response = requests.post(url, data=data)
         if response.status_code == 200:
             successful_requests += 1
+        print(response)
 
 while True:
     question_dictionary = {}
@@ -274,7 +275,7 @@ while True:
             print(ConsoleColor.FAIL + "An error has occured. Please ensure that you have entered a valid Int32" + ConsoleColor.ENDC)
             continue
     
-    new_url = re.sub(r'(?is)viewForm.+', "formResponse", url).replace("/d/e", "/u/0/d/e")
+    new_url = url.split("/viewform")[0].replace("/d/e", "/u/0/d/e") + "/formResponse"
     start = time.time()
     thread_count = int(times/10)
     threads = []
@@ -283,14 +284,14 @@ while True:
         t.daemon = True
         threads.append(t)
     
-    t = threading.Thread(target=do_request, args=(times % 10, new_url, answer,))
+    t = threading.Thread(target=do_request, args=(times % 10, new_url, answers,))
     t.daemon = True
     threads.append(t)
 
-    for i in range(thread_count):
+    for i in range(len(threads)):
         threads[i].start()
             
-    for i in range(thread_count):
+    for i in range(len(threads)):
         threads[i].join()
 
     end = time.time()
