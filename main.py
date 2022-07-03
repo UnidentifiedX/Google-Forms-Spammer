@@ -1,5 +1,4 @@
 import json
-import re
 import threading
 import time
 from bs4 import BeautifulSoup
@@ -25,7 +24,6 @@ def do_request(times: int, url, data):
         response = requests.post(url, data=data)
         if response.status_code == 200:
             successful_requests += 1
-        print(response)
 
 while True:
     question_dictionary = {}
@@ -61,6 +59,7 @@ while True:
     open_ended_ids = soup.find_all("input", {"type": "hidden", "value": ""})   
     open_ended_ids_count = 0
 
+    # TODO: Add support for filling in 'other' parameter in MCQ and Checkbox questions
     for id in questions:
         _soup = BeautifulSoup(str(id), 'html.parser')
         _question = _soup.find("span", {}).contents[0]
