@@ -22,6 +22,8 @@ Pretty fast multi-threaded, command-line driven google form spammer.
 - Currently cannot answer forms with `<span>`s that are not questions (including images)
 - **Important: Please enter the long version of the form link, i.e. it starts with `https://docs.google.com/forms` rather than `https://forms.gle`**
 
+**Also very important: Use at your own risk. I do not encourage nor endorse any kind of activity that is illegal, causes harm to others, or is morally wrong.**
+
 ![Image of Google Forms Spamming in action](./images/responses.png) 
 
 What happens after 5000 responses
