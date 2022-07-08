@@ -56,10 +56,9 @@ while True:
 
     # Split items into its separate beautifulsoup list 
     questions = soup.find_all(lambda div: div.name == "div" and len(div.attrs) == 2, {"role": "listitem"})
-    open_ended_ids = soup.find_all("input", {"type": "hidden", "value": ""})   
-    open_ended_ids_count = 0
 
     # TODO: Add support for filling in 'other' parameter in MCQ and Checkbox questions
+    # TODO: Ignore pictures
     for id in questions:
         _soup = BeautifulSoup(str(id), 'html.parser')
         _question = _soup.find("span", {}).contents[0]
@@ -119,7 +118,6 @@ while True:
                 if _soup.find("span", {"aria-label": "Required question"}) != None:
                     _required = True
 
-                open_ended_ids_count += 1
                 _type = "Open Ended"
 
         question_dictionary[_id] = {
@@ -201,7 +199,7 @@ while True:
                             answers[id] = ""
                             break
                         else:
-                            answer = input().split(",")
+                            answer = answer.split(",")
                             if set(answer).issubset(_options):
                                 correct = True if input(ConsoleColor.HEADER + f"Is the option '{answer}' you've entered correct? (y/n): " + ConsoleColor.ENDC).lower() == "y" else False
                                 if correct:
